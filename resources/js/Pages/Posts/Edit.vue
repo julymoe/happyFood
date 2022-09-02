@@ -20,7 +20,6 @@
                             </Link>
                         </div>
                         <form name="createForm" @submit.prevent="submit" enctype="multipart/form-data">
-                        @csrf
                                 <div className="flex flex-col">
                                     <div className="mb-4">
                                         <BreezeLabel for="title" value="Title" />
@@ -38,15 +37,12 @@
                                     <div className="mb-4">
                                         <BreezeLabel for="image" value="Image" />
                                         
-                                        <BreezeInput 
-                                            id="image" 
-                                            type="file" 
-                                            class="mt-1 block w-full" 
-                                            v-model="form.image" 
-                                            autofocus />
+                                        <img :src="post.image" className="w-20" />
                                         <span className="text-red-600" v-if="form.errors.image">
                                             {{ form.errors.image }}
                                         </span>
+                                        
+                                        <!-- <a href="{{url('admin/banner/changeImage')}}/{{$banner->id}}" class="btn btn-fill btn-sm btn-primary">Change Image</a> -->
                                     </div>
                                     <div className="mb-4">
                                         <BreezeLabel for="category" value="Category" />

@@ -95,25 +95,12 @@ class PostController extends Controller
         //                 ->with('success','Post has been created successfully.');
 
 
-
-        // if (!$request->has('image')) {
-        //     return response()->json(['message' => 'Missing file'], 422);
-        // }
-
-        // $pic = $request->file('image');
-        // $filename = $pic->getClientOriginalName();
-        // $filename = time(). $filename;
-        // $path = 'images';
-        // $id = $request->id;
-        // $pic->move($path,$filename);
-
-        // $post = new Post;
-        // $post->title = $request->title;
-        // $post->description = $request->description;
-        // $post->category = $request->category;
-        // $post->image = $filename;
-        // $post->save();
-        // return redirect(route('posts.index'));
+        $request->validate([
+            'title' => 'required',
+            'image' => 'required',
+            'description' => 'required',
+            'category' => 'required',
+        ]);
 
         if($request->hasFile('image')){
             $image = $request->file('image');
@@ -122,9 +109,7 @@ class PostController extends Controller
         
             $image_path = "/images/" . $image_name;
         }
-
-
-        //$image = $request->file('image')->store('images','public');
+        
         Post::create([
             'title' => $request->input('title'),
             'category' => $request->input('category'),
@@ -133,8 +118,6 @@ class PostController extends Controller
             'image' => $image_path
         ]);
         return  redirect(route('posts.index'));
-
-
     }
 
     /**
@@ -170,48 +153,21 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validator::make($request->all(),[
-        //     'title' => ['required'],
-        //     //'image' => ['required'],
-        //     'category' => ['required'],
-        //     'description' => ['required']
-        // ])->validate();
-
-        // $input = $request->all();
-
-        // if ($image = $request->file('image')) {
-        //     $destinationPath = 'images/';
-        //     $postImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-        //     $image->move($destinationPath, $postImage);
-        //     $input['image'] = "$postImage";
-        // } else {
-        //     unset($input['image']);
-        // }
-
-        // Post::find($id)->update($input);
-        // return redirect()->route('posts.index');
-
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'category' => 'required'
-        ]);
-        
-        $post = Post::find($id);
-        if($request->hasFile('image')){
-            $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
-            $path = $request->file('image')->store('public/images');
-            $post->image = $path;
-        }
+        $post = Post::find($id);        
         $post->title = $request->title;
         $post->category = $request->category;
         $post->description = $request->description;
+        if($request->hasFile('image')){
+            $image = $request->file('image');
+            $image_name = $image->getClientOriginalName();
+            $image->move(public_path('/images'),$image_name);
+        
+            $image_path = "/images/" . $image_name;
+            $post->image = $image_path;
+        } 
         $post->save();
-    
-        return redirect()->route('posts.index')
-                        ->with('success','Post updated successfully');
+        return  redirect(route('posts.index'))
+        ->with('success','Post updated successfully');
     }
 
     /**
